@@ -1,0 +1,9 @@
+.navbar-brand{
+  width: 20%;
+}
+
+.navbar-collapse{
+  width: 80%;
+  text-align: right;
+  flex-direction: row-reverse;
+}
