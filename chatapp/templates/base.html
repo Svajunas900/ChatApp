@@ -23,7 +23,7 @@
         </li>
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'chat' user_id=user.id %}">Chat</a>
+          <a class="nav-link" href="{% url 'chat' pk=user.id %}">Chat</a>
         </li>
         <form action="{% url 'logout' %}" method="post">
           {% csrf_token %}

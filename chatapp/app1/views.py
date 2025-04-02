@@ -1,9 +1,10 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView, FormView
+from django.shortcuts import render, redirect
+from django.views.generic import TemplateView, FormView, DetailView
 from app1.forms import UserLoginForm, UserRegisterForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from app1.admin import Conversation
 # Create your views here.
 
 class HomeView(TemplateView):
@@ -57,18 +58,23 @@ class ProtectedView(LoginRequiredMixin, TemplateView):
   template_name = "protected.html"
 
 
-class ChatView(LoginRequiredMixin, TemplateView):
+class ChatView(LoginRequiredMixin, DetailView):
   template_name = "chat.html"
+  model = Conversation
+  context_object_name = "conversation"
   
   
+  def get(self, request, *args, **kwargs):
+    response = super().get(request, *args, **kwargs)
+    response.set_cookie('user_id', self.request.user.id, max_age=60*60*24)  
+    return response
+
+
   def get_context_data(self, **kwargs):
-    context = super().get_context_data(**kwargs)
-    
-    user_id = self.kwargs['user_id']  
-    try:
-        user = User.objects.get(id=user_id)
-        context['user'] = user 
-    except User.DoesNotExist:
-        context['error'] = 'User not found'
-    
+    context = super().get_context_data(**kwargs)  
+    conversation = self.get_object()
+    context['messages'] = conversation.messages.all().order_by('created_at')
+    context['username'] = self.request.user.username
+    print(self.request.user.id)
     return context
+  

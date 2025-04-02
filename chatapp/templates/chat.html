@@ -7,6 +7,21 @@
 {% endblock %}
 {% block content %}
 <section class="main-section">
-  <h1>Welcome {{ user.id }} {{ user.username }}</h1>
+  <!-- <h1>Welcome {{ user.id }} {{ user.username }}</h1>
+  <button type="button" class="main-button">Click Me!!</button> -->
+  <div class="chat-container">
+    {% for message in messages %}
+    <div class="message {% if message.user_name != username %} user-message {% else %} bot-message {% endif %}">
+      <p>{{ message.text }}</p>
+    </div>
+    {% endfor %}
+    <ul id="messages_web">
+
+    </ul>
+    <form action="" class="chat-form">
+      <Input type="text" class="form-control chat-input" id="messageText"></Input>
+      <button type="submit" class="btn chat-submit">Submit</button>
+    </form>
 </section>
+<script src="{% static 'js/chat.js' %}"></script>
 {% endblock %}
