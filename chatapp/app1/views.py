@@ -60,3 +60,15 @@ class ProtectedView(LoginRequiredMixin, TemplateView):
 class ChatView(LoginRequiredMixin, TemplateView):
   template_name = "chat.html"
   
+  
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    
+    user_id = self.kwargs['user_id']  
+    try:
+        user = User.objects.get(id=user_id)
+        context['user'] = user 
+    except User.DoesNotExist:
+        context['error'] = 'User not found'
+    
+    return context
