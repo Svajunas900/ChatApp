@@ -66,7 +66,9 @@ class ChatView(LoginRequiredMixin, DetailView):
   
   def get(self, request, *args, **kwargs):
     response = super().get(request, *args, **kwargs)
+    conversation_id = self.get_object().id
     response.set_cookie('user_id', self.request.user.id, max_age=60*60*24)  
+    response.set_cookie('conversation_id', conversation_id, max_age=60*60*24)
     return response
 
 
@@ -75,6 +77,5 @@ class ChatView(LoginRequiredMixin, DetailView):
     conversation = self.get_object()
     context['messages'] = conversation.messages.all().order_by('created_at')
     context['username'] = self.request.user.username
-    print(self.request.user.id)
     return context
   

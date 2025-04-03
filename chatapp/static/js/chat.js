@@ -7,7 +7,8 @@ const getCookie = (name) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   const userId = getCookie('user_id');
-  const websocket = new WebSocket(`ws://localhost:5000/ws/${userId}`)
+  const conversation_id = getCookie('conversation_id')
+  const websocket = new WebSocket(`ws://localhost:5000/ws/${userId}/${conversation_id}`)
   const event = {
     "type": "message",
     "text": `Hello I'm User with id ${userId} `
@@ -15,7 +16,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const button = document.querySelector(".chat-submit")
 
   websocket.onmessage = function(event) {
-    let messages = document.getElementById('messages_web')
+    let messages = document.querySelector(".messages-container")
     let message = document.createElement('div')
     message.classList.add("message")
     message.classList.add("user-message")
@@ -24,6 +25,7 @@ window.addEventListener("DOMContentLoaded", () => {
     paragraph.appendChild(content)
     message.appendChild(paragraph)
     messages.appendChild(message)
+    messages.scrollTop = messages.scrollHeight
   };
 
   function sendMessage(){

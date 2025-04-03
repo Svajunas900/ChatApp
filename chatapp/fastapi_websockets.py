@@ -1,7 +1,11 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import uvicorn
+import sqlite3
+
 
 app = FastAPI()
+con = sqlite3.connect("db.sqlite3")
+
 
 class ConnectionManager:
   def __init__(self):
@@ -25,14 +29,18 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+@app.websocket("/ws/{client_id}/{conversation_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int, conversation_id: int):
   await manager.connect(websocket)
   try:
     while True:
       data = await websocket.receive_text()
-      await manager.send_personal_message(f"You wrote: {data}", websocket)
-      await manager.broadcast(f"Client #{client_id} says: {data}")
+
+      res = con.execute(f"SELECT username FROM auth_user WHERE id={client_id}")
+      username = res.fetchone()[0]
+      con.execute(f"INSERT INTO app1_messages (conversation_id, user_id_id, user_name, text, created_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)", (conversation_id, client_id, username, data))
+      con.commit()
+      await manager.broadcast(data)
   except WebSocketDisconnect:
     manager.disconnect(websocket)
     await manager.broadcast(f"Client #{client_id} left the chat")
